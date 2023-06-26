@@ -1,0 +1,14 @@
+html {
+    width: auto !important;
+}
+
+select {
+    text-align: center !important;
+}
+
+.right-bottom {
+    border-radius: 20px;
+    margin-top: 20px;
+    background-color: powderblue;
+    height: 700px;
+}
