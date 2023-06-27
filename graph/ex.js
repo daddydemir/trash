@@ -1,4 +1,3 @@
-
 const getData = async () => {
 
     let array;
@@ -48,7 +47,7 @@ const createGraph = async () => {
         data.datasets.push(item);
 
     }
-    console.log(data)
+
     return data;
 }
 
@@ -67,4 +66,39 @@ const draw = async () => {
             }
         }
     });
+}
+
+const refreshExchanges = async () => {
+    let btn = document.getElementById('refreshBtn');
+    btn.classList.add('fa-spin');
+    let array;
+
+    await fetch(
+        await getUrl() + "/getExchange",
+        {
+            method: 'get',
+            headers: {
+                'Accept': 'text/plain',
+                'Content-Type': 'application/json'
+            },
+        }
+    ).then(response => {
+        return response.json();
+    }).then(function (data) {
+        array = data;
+        btn.classList.remove('fa-spin')
+    });
+    await exchangeCreator(array);
+
+}
+
+const exchangeCreator = async (array) => {
+    let select = document.getElementById('exchanges');
+    for (let i = 0; i < array.length; i++) {
+        let o = document.createElement('option');
+        o.text = array[i].Name;
+        o.value = array[i].ExchangeId;
+        select.add(o);
+    }
+
 }
