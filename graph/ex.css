@@ -12,3 +12,19 @@ select {
     background-color: powderblue;
     height: 700px;
 }
+
+#coin-img {
+    display: block;
+    width: 250px;
+    height: 250px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+#coin-name {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    width: auto;
+    height: auto;
+}
