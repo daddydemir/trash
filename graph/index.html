@@ -19,12 +19,12 @@
     <div class="col">
         <div class="p-3">
             <form class="row g-3">
-                <select class="form-select">
-                    <option>PIE</option>
-                    <option selected>COLUMN</option>
-                    <option>LINE</option>
-                    <option>AREA</option>
-                    <option>HISTOGRAM</option>
+                <select class="form-select" onchange="graphTypeChange()" id="graphType">
+                    <option disabled>PIE</option>
+                    <option value="bar" selected> BAR</option>
+                    <option value="line">LINE</option>
+                    <option value="area">AREA</option>
+                    <option disabled>HISTOGRAM</option>
                 </select>
             </form>
             <div id="div-chart">

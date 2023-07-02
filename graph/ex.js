@@ -1,4 +1,5 @@
 let exchanges = [];
+let selectedData = [];
 let exchangeMap = {};
 let colors = {
     'pink': '#ff6384'
@@ -9,6 +10,8 @@ let colors = {
 }
 let days = ['pazartesi', 'salı', 'çarşamba', 'perşembe', 'cuma', 'cumartesi', 'pazar'];
 let myChart = null;
+let lineTension = 0.1;
+let areaTension = 0.01;
 
 
 const refreshExchanges = async () => {
@@ -55,8 +58,6 @@ const getWeekly = async () => {
     let id = document.getElementById('exchanges').value;
     let out = [];
 
-    startDate = '2023-06-01';
-    endDate = '2023-06-30';
 
     await fetch(
         await getUrl() + '/getDailyWithId',
@@ -67,8 +68,8 @@ const getWeekly = async () => {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-                startDate: startDate,
-                endDate: endDate,
+                startDate: startDate === '' ? '2023-06-26' : startDate,
+                endDate: endDate === '' ? '2023-07-03' : endDate,
                 id: id,
             }),
         },
@@ -83,7 +84,7 @@ const getWeekly = async () => {
     image.src = exchangeMap[id].CoinImage;
     let name = document.getElementById('coin-name');
     name.textContent = exchangeMap[id].Name;
-
+    selectedData = out;
     barGraph(out);
 
 
@@ -135,15 +136,140 @@ const barGraph = (arr) => {
     if (myChart !== null) {
         myChart.destroy();
     }
-    //canvas.remove();
-    //let div = document.getElementById('div-chart');
-    //div.append(`<canvas id="myChart"> </canvas>`);
-    //canvas = document.getElementById('myChart');
 
-    var ctx = canvas.getContext('2d');
+
+    let ctx = canvas.getContext('2d');
     myChart = new Chart(ctx, {
         type: 'bar',
         data: data,
         options: {}
     });
+}
+
+const lineGraph = (arr) => {
+
+    let data = {
+        labels: days,
+        datasets: [],
+    };
+    let mins = [];
+    let maxs = [];
+    let avgs = [];
+    for (let i = 0; i < arr.length; i++) {
+        mins[i] = arr[i].Min;
+        maxs[i] = arr[i].Max;
+        avgs[i] = arr[i].Avg;
+    }
+
+    let min = {
+        label: arr[0].ExchangeId + '-min',
+        data: mins,
+        backgroundColor: [colors['blue']],
+        tension: lineTension,
+    };
+    let avg = {
+        label: arr[0].ExchangeId + '-avg',
+        data: avgs,
+        backgroundColor: [colors['pink']],
+        tension: lineTension,
+    };
+    let max = {
+        label: arr[0].ExchangeId + '-max',
+        data: maxs,
+        backgroundColor: [colors['yellow']],
+        tension: lineTension,
+    };
+
+
+    data.datasets.push(min);
+    data.datasets.push(avg);
+    data.datasets.push(max);
+    let canvas = document.getElementById('myChart');
+    if (myChart !== null) {
+        myChart.destroy();
+    }
+
+
+    let ctx = canvas.getContext('2d');
+    myChart = new Chart(ctx, {
+        type: 'line',
+        data: data,
+        options: {}
+    });
+}
+
+const areaGraph = (arr) => {
+
+    let data = {
+        labels: days,
+        datasets: [],
+    };
+    let mins = [];
+    let maxs = [];
+    let avgs = [];
+    for (let i = 0; i < arr.length; i++) {
+        mins[i] = arr[i].Min;
+        maxs[i] = arr[i].Max;
+        avgs[i] = arr[i].Avg;
+    }
+
+    let min = {
+        label: arr[0].ExchangeId + '-min',
+        data: mins,
+        backgroundColor: [colors['blue']],
+        fill: true,
+        borderColor: colors['black'],
+        tension: areaTension,
+    };
+    let avg = {
+        label: arr[0].ExchangeId + '-avg',
+        data: avgs,
+        backgroundColor: [colors['pink']],
+        fill: true,
+        borderColor: colors['purple'],
+        tension: areaTension,
+    };
+    let max = {
+        label: arr[0].ExchangeId + '-max',
+        data: maxs,
+        backgroundColor: [colors['yellow']],
+        fill: true,
+        borderColor: colors['blue'],
+        tension: areaTension,
+    };
+
+
+    data.datasets.push(min);
+    data.datasets.push(avg);
+    data.datasets.push(max);
+    let canvas = document.getElementById('myChart');
+    if (myChart !== null) {
+        myChart.destroy();
+    }
+
+
+    let ctx = canvas.getContext('2d');
+
+    myChart = new Chart(ctx, {
+        type: 'line',
+        data: data
+    });
+}
+
+function dateFormat(date) {
+    let dates = date.split('-');
+    return `${dates[2]}-${dates[1]}-${dates[0]}`
+}
+
+
+async function graphTypeChange() {
+    let type = document.getElementById('graphType').value;
+
+    if (type === 'line') {
+        lineGraph(selectedData)
+    } else if (type === 'bar') {
+        barGraph(selectedData)
+    } else if (type === 'area') {
+        areaGraph(selectedData)
+    }
 }
