@@ -12,6 +12,7 @@ let days = ['pazartesi', 'salı', 'çarşamba', 'perşembe', 'cuma', 'cumartesi'
 let myChart = null;
 let lineTension = 0.1;
 let areaTension = 0.01;
+let rates = [];
 
 
 const refreshExchanges = async () => {
@@ -79,12 +80,20 @@ const getWeekly = async () => {
         out = data;
     });
 
+    let str = "";
+    for (let i = 0; i < out.length; i++) {
+
+        str += `<td> ${out[i].Rate.toFixed(2)} </td>`;
+    }
+
 
     let image = document.getElementById('coin-img');
     image.src = exchangeMap[id].CoinImage;
     let name = document.getElementById('coin-name');
     name.textContent = exchangeMap[id].Name;
     selectedData = out;
+    let tr = document.getElementById('tr-data');
+    tr.innerHTML = str;
     barGraph(out);
 
 
@@ -272,4 +281,33 @@ async function graphTypeChange() {
     } else if (type === 'area') {
         areaGraph(selectedData)
     }
+}
+
+const calculate = () => {
+    let amount = parseInt(document.getElementById('amount').value); // 5
+    let balance = parseInt(document.getElementById('balance').value); // 200
+    let loss_rate = parseInt(document.getElementById('loss-rate').value); // 5
+    let profit_rate = parseInt(document.getElementById('profit-rate').value); // 8
+
+    let loss = document.getElementById('loss');
+    let profit = document.getElementById('profit');
+    let loss_total = document.getElementById('loss-total');
+    let profit_total = document.getElementById('profit-total');
+    let profit_sales = document.getElementById('profit-sales');
+    let loss_sales = document.getElementById('loss-sales');
+
+    let piece = balance / amount;
+    let loss_calc = amount - ((amount * loss_rate) / 100); // zararına satış fiyatı
+    loss.value = (balance - piece * loss_calc).toFixed(2);
+    loss_sales.value = loss_calc.toFixed(2);
+
+    let profit_calc = amount + ((amount * profit_rate) / 100); // kârına satış fiyatı
+    profit.value = (piece * profit_calc - balance).toFixed(2);
+    profit_sales.value = profit_calc.toFixed(2);
+
+    loss_total.value = (piece * loss_calc).toFixed(2);
+    profit_total.value = (piece * profit_calc).toFixed(2);
+
+
+
 }
